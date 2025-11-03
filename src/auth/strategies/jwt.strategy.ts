@@ -2,14 +2,18 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config'; // ודא שזה מיובא
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private configService: ConfigService) { // הזרקה
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'YOUR_VERY_SECRET_KEY_12345', // חייב להיות זהה למה שב-auth.module!
+      
+      // --- התיקון כאן ---
+      // השתמש ב-getOrThrow כדי להבטיח שהערך הוא string
+      secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
     });
   }
 

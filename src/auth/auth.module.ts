@@ -7,14 +7,19 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy'; // <-- ייבוא חדש
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      secret: 'YOUR_VERY_SECRET_KEY_12345',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({ // שינוי ל-registerAsync
+      imports: [ConfigModule], // ייבוא מודול ההגדרות
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'), // קריאה ממשתנה סביבה
+        signOptions: { expiresIn: '1d' },
+      }),
+      inject: [ConfigService], // הזרקה של השירות
     }),
   ],
   controllers: [AuthController],
