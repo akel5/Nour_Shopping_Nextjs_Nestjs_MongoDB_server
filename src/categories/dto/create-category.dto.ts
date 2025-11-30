@@ -1,6 +1,13 @@
 // server/src/categories/dto/create-category.dto.ts
+import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 
 export class CreateCategoryDto {
-  readonly name: string;
-  readonly logoUrl: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsUrl()
+  imageUrl: string;
 }
